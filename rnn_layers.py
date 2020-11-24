@@ -1,4 +1,4 @@
-# This library is used for Assignment3_Part1_Implementing_RNN
+
 import numpy as np
 
 def rnn_step_forward(x, prev_h, Wx, Wh, b):
