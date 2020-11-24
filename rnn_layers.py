@@ -1,5 +1,7 @@
 """
-jongwan Kim / jongwankim@snu.ac.kr
+* Copyright 2020 Jongwankim
+* Released under the MIT license.
+* http://github.com/jongwankim0317
 """
 
 import numpy as np
