@@ -1,4 +1,3 @@
-
 import numpy as np
 
 def rnn_step_forward(x, prev_h, Wx, Wh, b):
