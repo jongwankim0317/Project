@@ -1,7 +1,5 @@
 """
-* Copyright 2020 Jongwankim
-* Released under the MIT license.
-* http://github.com/jongwankim0317
+Adapted from https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html
 """
 
 import torch
