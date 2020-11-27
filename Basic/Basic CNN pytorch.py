@@ -8,9 +8,9 @@ from glob import glob
 
 
 seed = 1
-batch_size = 4096
-test_batch_size = 4096
-epoch = 50
+batch_size = 256
+test_batch_size = 256
+epoch = 100
 
 GPU_NUM = 0
 device = torch.device(f'cuda:{GPU_NUM}' if torch.cuda.is_available() else 'cpu')
@@ -49,9 +49,10 @@ test_loader = torch.utils.data.DataLoader(
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5, 1)
-        self.conv2 = nn.Conv2d(20, 50, 5, 1)
-        self.fc1 = nn.Linear(4*4*50, 500)
+        self.conv1 = nn.Conv2d(1, 20, kernel_size=5, stride=1, padding=2)
+        self.conv2 = nn.Conv2d(20, 50, kernel_size=5, stride=1, padding=2)
+        self.conv3 = nn.Conv2d(50, 100, kernel_size=1, stride=2)
+        self.fc1 = nn.Linear(4*4*100, 500)
         self.fc2 = nn.Linear(500, 10)
 
     def forward(self, x):
@@ -59,9 +60,10 @@ class Net(nn.Module):
         x = F.max_pool2d(x, 2, 2)
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
+        x = self.conv3(x)
 
         # print(x.shape) #(for size)
-        x = x.view(-1, 4*4*50) # batch size: -1 (don't know)
+        x = x.view(-1, 4*4*100) # batch size: -1 (don't know)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
@@ -91,7 +93,7 @@ for epoch in range(1, epoch+1):
         optimizer.step()
 
         if batch_idx % log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.7f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                        100. * batch_idx / len(train_loader), loss.item()))
 
