@@ -19,3 +19,4 @@ class RNN(nn.Module):
         output = self.softmax(out)
         return output
 
+ 
