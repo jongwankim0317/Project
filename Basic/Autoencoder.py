@@ -1,5 +1,3 @@
-__author__ = 'SherlockLiao'
-
 import torch
 import torchvision
 from torch import nn
