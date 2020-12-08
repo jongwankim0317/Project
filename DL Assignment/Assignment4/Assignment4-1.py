@@ -44,7 +44,7 @@ class Decoder(nn.Module):
     def forward(self, z):
         x = F.relu(self.dc1(z))
         x = F.relu(self.dc2(x))
-        out = F.sigmoid(self.dc3(x))
+        out = F.sigmoid(self.dc3(x)) ## sigmoid check!
 
         return out
 
@@ -64,10 +64,7 @@ class VAE(nn.Module):
         return recon_imgs
 
     def reparameterize(self, eps, mu, logvar):
-        std = logvar.mul(0.5).exp_()
-        eps = torch.cuda.FloatTensor(std.size()).normal_()
-        eps = Variable(eps)
-        return eps.mul(std).add_(mu)
+        return mu+torch.exp(logvar/2)*eps
 
     def forward(self, imgs):
         mu, logvar = self.encode(imgs)
@@ -114,8 +111,8 @@ for it in range(total_iter):
     imgs = imgs.view((-1, img_dim)).to(device)
     recon_imgs, mu, logvar = vae(imgs)
 
-    recon_loss = F.binary_cross_entropy(recon_imgs, imgs.view(-1, 784), reduction='sum')
-    kldiv_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    recon_loss = F.binary_cross_entropy(recon_imgs, imgs, size_average=False) / batch_size
+    kldiv_loss = torch.mean(0.5 * torch.sum(torch.exp(logvar) + mu**2-1. - logvar,1))
     total_loss = (recon_loss + kldiv_loss)
 
     optimizer.zero_grad()
@@ -131,6 +128,7 @@ for it in range(total_iter):
     if (it + 1) % viz_freq == 0:
         with torch.no_grad():
             gen_imgs = vae.sample(16)
+
         org_imgs = make_grid(imgs[:16, :].view((16, 1, 28, 28)), nrow=4).permute(1, 2, 0).cpu().detach().numpy()
         plt.subplot(1, 3, 1)
         plt.imshow(org_imgs)
